@@ -22,3 +22,13 @@ Sample test definition file
 
 Hb
 Hb;T;mg/dl;0-12
+
+Structure of a database table of a test
+---------------------------------------
+id
+patient_id
+test1
+test2
+user
+status (data entered/printed)
+date time (date and time of printing)
