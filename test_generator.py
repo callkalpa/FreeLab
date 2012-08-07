@@ -3,17 +3,37 @@
 import sys
 import db
 
+def decode_test_definition(fi):
+	global data
+	f = open(fi,'r')
+	data = []
+
+	for line in f.readlines():
+		data.append(line.replace('\n',''))
+	
+	f.close()
+
+# start of report section
+
 def check_for_report():
 	return True
 
 def generate_report():
 	pass
 
+# end of report section
+
+# start of gui section
+
 def check_for_gui():
 	return True
 
 def generate_gui():
 	pass
+
+# end of gui section
+
+# start of database section
 
 def check_for_table():
 	sql = 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema="' + db.get_database() + '" AND table_name="' + db.validate(data[0]) + '";'
@@ -55,15 +75,7 @@ def generate_table():
 	db.execute_sql(sql)
 	print '\'' + data[0] + '\' table created'
 
-def decode_test_definition(fi):
-	global data
-	f = open(fi,'r')
-	data = []
-
-	for line in f.readlines():
-		data.append(line.replace('\n',''))
-	
-	f.close()
+# end of database section
 
 def main():
 	for fi in sys.argv[1:]:
