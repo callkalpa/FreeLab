@@ -23,6 +23,10 @@ def execute_sql(sql):
 	cur.execute(sql)
 	return cur
 
+# modifies text so that so that it is valid as a table/field name
+def validate(text):
+	return text.lower().replace(' ','_')
+
 def main():
 	pass
 
