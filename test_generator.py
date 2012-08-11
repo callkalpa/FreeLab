@@ -2,6 +2,10 @@
 
 import sys
 import db
+import gui
+import os
+
+GUI_DIR='gui'
 
 def decode_test_definition(fi):
 	global data
@@ -26,10 +30,14 @@ def generate_report():
 # start of gui section
 
 def check_for_gui():
-	return True
+	return False
 
 def generate_gui():
-	pass
+	global data
+	f = open(os.path.join(GUI_DIR, db.validate(data[0])+ '.glade'), 'w')
+	f.write(gui.get_glade(data))
+	f.flush()
+	f.close()
 
 # end of gui section
 
