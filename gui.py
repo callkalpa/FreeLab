@@ -48,8 +48,9 @@ def get_row_xml(fields):
 		temp = temp + get_label(name, i, 0)		
 
 		# input field
+		items = ''
 		if test_type == 'A': # text area
-			pass
+			object_class = 'GtkTextView'
 		elif test_type[0] == 'T' and len(test_type)>1: # combo box
 			object_class = 'GtkComboBoxText'
 			items = """
@@ -65,7 +66,6 @@ def get_row_xml(fields):
             </items>"""
 		else: # text field
 			object_class = 'GtkEntry'
-			items = ''
 
 
 		temp = temp + """
