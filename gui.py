@@ -59,7 +59,7 @@ def get_row_xml(fields):
 			its = test_type[2:-1].split(',') # get items to be inserted to the combo box
 			for item in its:
 				items = items + """
-              <item translatable="yes">""" + item + """</item>"""
+              <item translatable="yes">""" + item.strip() + """</item>"""
 
 			items = items + """
             </items>"""
