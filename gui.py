@@ -16,8 +16,7 @@ def get_xml_header(id):
         <property name="can_focus">False</property>
         <property name="row_spacing">10</property>
         <property name="column_spacing">5</property>
-        <property name="row_homogeneous">True</property>
-		"""
+        <property name="row_homogeneous">True</property>"""
 
 	return temp
 
@@ -26,8 +25,7 @@ def get_xml_footer():
       </object>
     </child>
   </object>
-</interface>
-		"""
+</interface>"""
 		
 
 	return temp
@@ -45,19 +43,37 @@ def get_row_xml(fields):
 		test_type = t[1]
 		unit = t[2]
 		reference_range = t[3]
-		
+	
 		# test name
 		temp = temp + get_label(name, i, 0)		
 
 		# input field
-		if test_type == 'A':
+		if test_type == 'A': # text area
 			pass
-		else:
-			temp = temp + """
+		elif test_type[0] == 'T' and len(test_type)>1: # combo box
+			object_class = 'GtkComboBoxText'
+			items = """
+            <property name="entry_text_column">0</property>
+            <property name="id_column">1</property>
+            <items>"""
+			its = test_type[2:-1].split(',') # get items to be inserted to the combo box
+			for item in its:
+				items = items + """
+              <item translatable="yes">""" + item + """</item>"""
+
+			items = items + """
+            </items>"""
+		else: # text field
+			object_class = 'GtkEntry'
+			items = ''
+
+
+		temp = temp + """
 	<child>
-          <object class="GtkEntry" id=\"""" + id + """\">
-            <property name="visible">True</property>
+	  <object class=\"""" + object_class + """\" id=\"""" + id + """\">
+	    <property name="visible">True</property>
             <property name="can_focus">True</property>
+		""" + items + """
           </object>
           <packing>
             <property name="left_attach">1</property>
@@ -65,8 +81,7 @@ def get_row_xml(fields):
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
-        </child>
-"""
+        </child>"""
 		
 		# unit
 		if unit != '':
@@ -78,8 +93,8 @@ def get_row_xml(fields):
 
 		i = i + 1
 
-		# done button
-		temp = temp + """
+	# done button
+	temp = temp + """
 	<child>
           <object class="GtkButton" id="button""" + str(random_id) + """\">
             <property name="label" translatable="yes">Done</property>
@@ -95,8 +110,7 @@ def get_row_xml(fields):
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
-        </child>
-		"""
+        </child>"""
 
 	random_id = random_id + 1
 
@@ -108,8 +122,7 @@ def get_label(value, row, column):
 	global random_id
 
 	temp = """
-
-<child>
+	<child>
           <object class="GtkLabel" id="label""" + str(random_id) + """\">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -123,8 +136,7 @@ def get_label(value, row, column):
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
-        </child>
-			"""
+        </child>"""
 	random_id = random_id + 1
 
 	return temp		
