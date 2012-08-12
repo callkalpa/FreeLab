@@ -76,7 +76,6 @@ def generate_table():
 
 
 	sql = sql + ('`user` VARCHAR(2) NULL , \n'
-	'`status` VARCHAR(10) NULL , \n'
 	'`time_stamp` DATE NULL)')
 
 
