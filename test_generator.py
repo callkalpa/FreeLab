@@ -71,7 +71,7 @@ def generate_table():
 	for test in data[1:]:
 		tmp = test.split(';')
 		test_name = db.validate(tmp[0])
-		value = get_table_field(tmp[1])
+		value = get_table_field(tmp[1][0])
 		sql = sql + '`' + test_name + '` ' + value + ' NULL , \n'
 
 
