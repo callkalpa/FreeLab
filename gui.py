@@ -4,12 +4,34 @@ xml_output=''
 random_id = 1 # used to generate id's for labels, buttons etc
 XPAD = 10
 
-def get_xml_header(id):
+def get_xml_header(title):
 	temp = """<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkWindow" id=\"""" + id + """\">
+  <object class="GtkWindow" id=\"""" + title + """\">
     <property name="can_focus">False</property>
+    <signal name="delete-event" handler="onDeleteWindow" swapped="no"/>
+    <child>
+      <object class="GtkBox" id="box1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+	<property name="spacing">20</property>
+        <child>
+          <object class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">""" + title + """</property>
+	    <attributes>
+              <attribute name="weight" value="bold"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
     <child>
       <object class="GtkGrid" id="grid1">
         <property name="visible">True</property>
@@ -22,6 +44,13 @@ def get_xml_header(id):
 
 def get_xml_footer():
 	temp = """
+      </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>
@@ -107,6 +136,7 @@ def get_row_xml(fields):
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
+	    <signal name="clicked" handler="done" swapped="no"/>
           </object>
           <packing>
             <property name="left_attach">3</property>
@@ -148,7 +178,7 @@ def get_label(value, row, column):
 # returns the xml of glade, when the list of fields is passed
 def get_glade(data):
 
-	xml_output = get_xml_header(db.validate(data[0]))
+	xml_output = get_xml_header(data[0])
 	
 	xml_output = xml_output + get_row_xml(data[1:])
 
