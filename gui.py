@@ -44,14 +44,12 @@ def get_row_xml(fields):
 		unit = t[2]
 		reference_range = t[3]
 	
-		# test name
-		temp = temp + get_label(name, i, 0)		
 
 		# input field
 		items = ''
 		if test_type == 'A': # text area
 			object_class = 'GtkTextView'
-		elif test_type[0] == 'T' and len(test_type)>1: # combo box
+		elif test_type[0] == 'T' and len(test_type)>1 and test_type[1] == '[': # combo box
 			object_class = 'GtkComboBoxText'
 			items = """
             <property name="entry_text_column">0</property>
@@ -64,6 +62,8 @@ def get_row_xml(fields):
 
 			items = items + """
             </items>"""
+		elif len(test_type)>1 and test_type[1] == '(': # calculation field, just ignore it
+			continue
 		else: # text field
 			object_class = 'GtkEntry'
 
@@ -82,6 +82,10 @@ def get_row_xml(fields):
             <property name="height">1</property>
           </packing>
         </child>"""
+		
+		# test name
+		# label was moved here so that calculation field labels are not added
+		temp = temp + get_label(name, i, 0)		
 		
 		# unit
 		if unit != '':
