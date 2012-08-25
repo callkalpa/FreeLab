@@ -38,10 +38,10 @@ def increase_report_height(height):
 # title of the test (for tests with multiple fields)
 def get_title(title):
 	increase_report_height(0.75)
-	return '<h1>' + title + '</h1>\n'
+	return '<para style="report_title"><i>' + title + '</i></para>\n'
 
 def get_fields(fields):
-	temp = """<blockTable repeatRows="1" alignment="left" colWidths="40% 20% 20% 20%">
+	temp = """<blockTable style="fields" repeatRows="1" alignment="left" colWidths="40% 20% 20% 20%">
     <tr><td py:for="i in range(4)"></td></tr>
     <tr py:for="line in data"><td py:for="col in line.split(';')" py:content="col" /></tr>
   </blockTable>"""
@@ -60,12 +60,22 @@ def write_xml():
 	f.write('''<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
 <!DOCTYPE document SYSTEM "rml_1_0.dtd">
 <document xmlns:py="http://genshi.edgewall.org/">
+<docinit>
+	<registerTTFont faceName="Garamond" fileName="font/Garamond.ttf"/>
+	<registerTTFont faceName="Garamond-bold" fileName="font/Garamonb.ttf"/>
+</docinit>
 <template leftMargin="0.5in" rightMargin="0.5in" showBoundary="1" pageSize="A3">
   <pageTemplate id="main">
     <frame id="first" x1="0.5in" y1="0.5in" width="''' + str(REPORT_WIDTH) + '''in" height="''' + str(REPORT_HEIGHT) + '''in" showBoundary="1"/>
   </pageTemplate>
 </template>
 <stylesheet>
+	<paraStyle name="report_title" fontName="Garamond-bold" fontSize="14"/>
+	<blockTableStyle id="fields">
+		<!-- This sets a font for the second row -->
+		<blockFont name="Garamond" size="12" start="0,0" stop="-1,-1"/>
+		<blockFont name="Garamond-bold" size="12" start="1,1" stop="1,-1" />
+	</blockTableStyle>
 </stylesheet>
 <story>''')
 
