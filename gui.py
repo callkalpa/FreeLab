@@ -8,7 +8,7 @@ def get_xml_header(title):
 	temp = """<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkWindow" id=\"""" + title + """\">
+  <object class="GtkWindow" id="main">
     <property name="can_focus">False</property>
     <signal name="delete-event" handler="onDeleteWindow" swapped="no"/>
     <child>
