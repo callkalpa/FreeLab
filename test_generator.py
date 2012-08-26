@@ -64,7 +64,7 @@ def get_table_field(value):
 
 def generate_table():
 	sql = ('CREATE TABLE `' + db.validate(data[0]) + '` (\n' + 
-	'`id` INT NOT NULL ,\n' +
+	'`id` INT NOT NULL AUTO_INCREMENT,\n' +
   	'`patient_id` VARCHAR(12) NULL ,\n')
 
 	for test in data[1:]:
@@ -75,7 +75,8 @@ def generate_table():
 
 
 	sql = sql + ('`user` VARCHAR(2) NULL , \n'
-	'`time_stamp` DATE NULL)')
+	'`time_stamp` TIMESTAMP NULL, \n'
+	'PRIMARY KEY (`id`))')
 
 
 	db.execute_sql(sql)
