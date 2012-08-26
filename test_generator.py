@@ -4,18 +4,17 @@ import sys
 import db
 import gui
 import os
+import test_fields
 
 GUI_DIR='gui'
 
+test_definition_file = '' # file name of the test definition
+
 def decode_test_definition(fi):
 	global data
-	f = open(fi,'r')
-	data = []
-
-	for line in f.readlines():
-		data.append(line.replace('\n',''))
-	
-	f.close()
+	global test_definition_file
+	test_definition_file = fi
+	data = test_fields.get_table_field_list(fi)
 
 # start of report section
 
@@ -35,7 +34,7 @@ def check_for_gui():
 def generate_gui():
 	global data
 	f = open(os.path.join(GUI_DIR, db.validate(data[0])+ '.glade'), 'w')
-	f.write(gui.get_glade(data))
+	f.write(gui.get_glade(data, test_definition_file))
 	f.flush()
 	f.close()
 

@@ -3,6 +3,7 @@ import db
 xml_output=''
 random_id = 1 # used to generate id's for labels, buttons etc
 XPAD = 10
+test_definition_file = '' # name of the test definition file
 
 def get_xml_header(title):
 	temp = """<?xml version="1.0" encoding="UTF-8"?>
@@ -18,7 +19,7 @@ def get_xml_header(title):
         <property name="orientation">vertical</property>
 	<property name="spacing">20</property>
         <child>
-          <object class="GtkLabel" id="label1">
+          <object class="GtkLabel" id="title">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">""" + title + """</property>
@@ -61,6 +62,7 @@ def get_xml_footer():
 # returns the xml corresponding to a row of a test
 def get_row_xml(fields):
 	global random_id
+	global test_definition_file
 
 	temp = ''
 	i = 0
@@ -146,6 +148,23 @@ def get_row_xml(fields):
           </packing>
         </child>"""
 
+	# label to hold the name of the test definition file
+	temp = temp + """<child>
+              <object class="GtkLabel" id="test_filename">
+                <property name="can_focus">False</property>
+		<property name="visible">False</property>
+		<property name="no_show_all">True</property>
+                <property name="label" translatable="yes">""" + test_definition_file + """</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">""" + str(i) + """</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+	"""
+
 	random_id = random_id + 1
 
 
@@ -176,7 +195,9 @@ def get_label(value, row, column):
 	return temp		
 
 # returns the xml of glade, when the list of fields is passed
-def get_glade(data):
+def get_glade(data, filename): # filename is the test definition file name
+	global test_definition_file
+	test_definition_file = filename
 
 	xml_output = get_xml_header(data[0])
 	
