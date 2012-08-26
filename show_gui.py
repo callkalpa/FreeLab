@@ -4,6 +4,7 @@ from gi.repository import Gtk
 import sys
 import db
 import test_fields
+import datetime
 
 builder = Gtk.Builder()
 
@@ -19,6 +20,9 @@ class Handler:
 		fields = test_fields.get_gui_field_list(test_definition_file)
 
 		values = {} # to hold the field names and values to be fed into the table
+		values['`id`'] = '0' # auto increment value
+		values['`time_stamp`'] = "'" + str(datetime.datetime.now()) + "'"
+
 		for field in fields:
 			obj =  builder.get_object(field)
 			if obj == None:
@@ -27,14 +31,14 @@ class Handler:
 			object_type = obj.get_name()
 			
 			if object_type == 'GtkEntry':
-				values[field] = get_gtkEntry_value(obj)
+				values['`' + field + '`'] = "'" + get_gtkEntry_value(obj) + "'"
 			elif object_type == 'GtkTextView':
-				values[field] = get_gtkTextView_value(obj)
+				values['`' + field + '`'] = "'" + get_gtkTextView_value(obj) + "'"
 			elif object_type == 'GtkComboBoxText':
-				values[field] = get_gtkComboBoxText_value(obj)
+				values['`' + field + '`'] = "'" + get_gtkComboBoxText_value(obj) + "'"
 
-
-		print values
+		# calls sql insert command with test definition file name, fields and values
+		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)	
 
 
 
@@ -46,7 +50,10 @@ def get_gtkTextView_value(obj):
 	return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
 
 def get_gtkComboBoxText_value(obj):
-	return obj.get_active_text()
+	temp = obj.get_active_text()
+	if temp == None:
+		return ''
+	return temp
 
 
 def main():
