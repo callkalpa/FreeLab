@@ -19,9 +19,16 @@ def get_database():
 def execute_sql(sql):
 	read_config_file()
 	db = MySQLdb.connect(**settings)
+	db.autocommit(True)
 	cur = db.cursor()
 	cur.execute(sql)
 	return cur
+
+# insert command to table to insert test data
+def feed_test_data(test_name, values):
+	sql = 'INSERT INTO `' + test_name + '` (' + (','.join(values.keys())) + ') VALUES (' + (','.join(values.values())) + ')'
+	print sql
+	execute_sql(sql)
 
 # modifies text so that so that it is valid as a table/field name
 def validate(text):
