@@ -54,7 +54,7 @@ def check_for_table():
 # returns the appropriate sql table field type
 def get_table_field(value):
 	if value is 'T':
-		return 'VARCHAR(12)'
+		return 'VARCHAR(20)'
 	if value is 'I':
 		return 'INT'
 	if value is 'F':
