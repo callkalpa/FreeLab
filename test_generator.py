@@ -14,7 +14,8 @@ def decode_test_definition(fi):
 	global data
 	global test_definition_file
 	test_definition_file = fi
-	data = test_fields.get_table_field_list(fi)
+	test_field = test_fields.TestField(fi)
+	data = test_field.get_table_field_list()
 
 # start of report section
 
