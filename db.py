@@ -27,7 +27,6 @@ def execute_sql(sql):
 # insert command to table to insert test data
 def feed_test_data(test_name, values):
 	sql = 'INSERT INTO `' + test_name + '` (' + (','.join(values.keys())) + ') VALUES (' + (','.join(values.values())) + ')'
-	print sql
 	execute_sql(sql)
 
 # modifies text so that so that it is valid as a table/field name
