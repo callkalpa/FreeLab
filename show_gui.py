@@ -8,16 +8,20 @@ import datetime
 
 builder = Gtk.Builder()
 
+test_field = None
+
 class Handler:
 	global builder
+	global test_field
 
 	def onDeleteWindow(self, *args):
 		Gtk.main_quit(*args)
 	
 
 	def done(self, button):
-		test_definition_file = builder.get_object('test_filename').get_text()
-		fields = test_fields.get_gui_field_list(test_definition_file)
+		#test_definition_file = builder.get_object('test_filename').get_text()
+		#fields = test_fields.get_gui_field_list(test_definition_file)
+		fields = test_field.get_gui_field_list()
 
 		values = {} # to hold the field names and values to be fed into the table
 		values['`id`'] = '0' # auto increment value
@@ -30,7 +34,7 @@ class Handler:
 
 			if obj == None:
 				# calculation field
-				#values[key] = get_calculation_result() # result of the calculation 
+				values[key] = "'" + get_calculation_result() + "'" # result of the calculation 
 				print field
 				continue
 
@@ -46,7 +50,8 @@ class Handler:
 		# calls sql insert command with test definition file name, fields and values
 		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)	
 
-
+def get_calculation_result():
+	return '2000'
 
 def get_gtkEntry_value(obj):
 	return obj.get_text()
@@ -64,13 +69,17 @@ def get_gtkComboBoxText_value(obj):
 
 def main():
 	global builder
+	global test_field
 	
 	builder.add_from_file(sys.argv[1])
 	builder.connect_signals(Handler())
 
 	window = builder.get_object("main")
 	window.show_all()
-
+	
+	test_definition_file = builder.get_object('test_filename').get_text()
+	test_field = test_fields.TestField(test_definition_file)
+	
 	Gtk.main()
 
 if __name__ == '__main__':
