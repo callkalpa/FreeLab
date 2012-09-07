@@ -23,11 +23,9 @@ class TestField():
 		for field in self.output[1:]:
 			temp.append(db.validate(field.split(';')[0]))
 		
-		print "TEST FIELDS"
-		print temp
 		return temp
 
 	def get_calculation(self, field):
-		for f in output:
-			if f.split(';')[0] == field:
-				return f.split(';')[1]
+		for f in self.output:
+			if db.validate(f.split(';')[0]) == field:
+				return f.split(';')[1][2:-1] # return without the paranthesis and field type
