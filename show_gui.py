@@ -5,10 +5,12 @@ import sys
 import db
 import test_fields
 import datetime
+import re
 
 builder = Gtk.Builder()
 
 test_field = None
+values = {} # to hold the field names and values to be fed into the table
 
 class Handler:
 	global builder
@@ -19,11 +21,9 @@ class Handler:
 	
 
 	def done(self, button):
-		#test_definition_file = builder.get_object('test_filename').get_text()
-		#fields = test_fields.get_gui_field_list(test_definition_file)
+		global values
 		fields = test_field.get_gui_field_list()
 
-		values = {} # to hold the field names and values to be fed into the table
 		values['`id`'] = '0' # auto increment value
 		values['`time_stamp`'] = "'" + str(datetime.datetime.now()) + "'"
 
@@ -34,8 +34,7 @@ class Handler:
 
 			if obj == None:
 				# calculation field
-				values[key] = "'" + get_calculation_result() + "'" # result of the calculation 
-				print field
+				values[key] = "'" + str(get_calculation_result(field)) + "'" # result of the calculation 
 				continue
 
 			object_type = obj.get_name()
@@ -50,8 +49,24 @@ class Handler:
 		# calls sql insert command with test definition file name, fields and values
 		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)	
 
-def get_calculation_result():
-	return '2000'
+def get_calculation_result(field):
+	global test_field
+	global values
+
+	cal = test_field.get_calculation(field)
+	
+	# split by '(' and ')' and arthmetic operators, +, -, / and
+	pattern = re.compile(r"[+-/*()]")
+	temp = pattern.split(cal)
+	
+	# replace fields in the calculation with values
+	for t in temp:
+		tem = "`" + db.validate(t.strip()) + "`"
+		if tem in values.keys():
+			val = float(values[tem].strip().replace("'","")) # convert to float for possible decimal calculations
+			cal = cal.replace(t, str(val))
+
+	return eval(cal)
 
 def get_gtkEntry_value(obj):
 	return obj.get_text()
