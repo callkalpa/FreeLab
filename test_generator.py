@@ -4,18 +4,19 @@ import sys
 import db
 import gui
 import os
+import test_fields
 
 GUI_DIR='gui'
 
+test_definition_file = '' # file name of the test definition
+
 def decode_test_definition(fi):
 	global data
-	f = open(fi,'r')
-	data = []
-
-	for line in f.readlines():
-		data.append(line.replace('\n',''))
-	
-	f.close()
+	global test_definition_file
+	test_definition_file = fi
+	test_field = test_fields.TestField(fi)
+	data = test_field.get_test_name_and_fields()
+	print data
 
 # start of report section
 
@@ -35,7 +36,7 @@ def check_for_gui():
 def generate_gui():
 	global data
 	f = open(os.path.join(GUI_DIR, db.validate(data[0])+ '.glade'), 'w')
-	f.write(gui.get_glade(data))
+	f.write(gui.get_glade(data, test_definition_file))
 	f.flush()
 	f.close()
 
@@ -44,9 +45,9 @@ def generate_gui():
 # start of database section
 
 def check_for_table():
-	sql = 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema="' + db.get_database() + '" AND table_name="' + db.validate(data[0]) + '";'
+	sql = 'SELECT COUNT(*) AS exist FROM information_schema.tables WHERE table_schema="' + db.get_database() + '" AND table_name="' + db.validate(data[0]) + '";'
 	cur = db.execute_sql(sql)
-	tmp = cur.fetchone()[0]
+	tmp = cur.fetchone()['exist']
 	if tmp > 0:
 		print 'table \'' + data[0] + '\' already exists'
 		return True;
@@ -55,7 +56,7 @@ def check_for_table():
 # returns the appropriate sql table field type
 def get_table_field(value):
 	if value is 'T':
-		return 'VARCHAR(12)'
+		return 'VARCHAR(20)'
 	if value is 'I':
 		return 'INT'
 	if value is 'F':
@@ -65,7 +66,7 @@ def get_table_field(value):
 
 def generate_table():
 	sql = ('CREATE TABLE `' + db.validate(data[0]) + '` (\n' + 
-	'`id` INT NOT NULL ,\n' +
+	'`id` INT NOT NULL AUTO_INCREMENT,\n' +
   	'`patient_id` VARCHAR(12) NULL ,\n')
 
 	for test in data[1:]:
@@ -76,7 +77,8 @@ def generate_table():
 
 
 	sql = sql + ('`user` VARCHAR(2) NULL , \n'
-	'`time_stamp` DATE NULL)')
+	'`time_stamp` TIMESTAMP NULL, \n'
+	'PRIMARY KEY (`id`))')
 
 
 	db.execute_sql(sql)
