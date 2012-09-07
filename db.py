@@ -19,9 +19,21 @@ def get_database():
 def execute_sql(sql):
 	read_config_file()
 	db = MySQLdb.connect(**settings)
-	cur = db.cursor()
+	db.autocommit(True)
+	#cur = db.cursor()
+	cur = db.cursor(MySQLdb.cursors.DictCursor)
 	cur.execute(sql)
 	return cur
+
+# insert command to table to insert test data
+def feed_test_data(test_name, values):
+	sql = 'INSERT INTO `' + test_name + '` (' + (','.join(values.keys())) + ') VALUES (' + (','.join(values.values())) + ')'
+	execute_sql(sql)
+
+# retrives test data based on patient_id
+def retrive_test_data(test_name, patient_id):
+	sql = 'SELECT * FROM `' + test_name + '` WHERE `patient_id`=' + patient_id
+	return execute_sql(sql)
 
 # modifies text so that so that it is valid as a table/field name
 def validate(text):
