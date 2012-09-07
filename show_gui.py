@@ -25,17 +25,23 @@ class Handler:
 
 		for field in fields:
 			obj =  builder.get_object(field)
+
+			key = '`' + field + '`'			
+
 			if obj == None:
+				# calculation field
+				#values[key] = get_calculation_result() # result of the calculation 
+				print field
 				continue
 
 			object_type = obj.get_name()
 			
 			if object_type == 'GtkEntry':
-				values['`' + field + '`'] = "'" + get_gtkEntry_value(obj) + "'"
+				values[key] = "'" + get_gtkEntry_value(obj) + "'"
 			elif object_type == 'GtkTextView':
-				values['`' + field + '`'] = "'" + get_gtkTextView_value(obj) + "'"
+				values[key] = "'" + get_gtkTextView_value(obj) + "'"
 			elif object_type == 'GtkComboBoxText':
-				values['`' + field + '`'] = "'" + get_gtkComboBoxText_value(obj) + "'"
+				values[key] = "'" + get_gtkComboBoxText_value(obj) + "'"
 
 		# calls sql insert command with test definition file name, fields and values
 		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)	
