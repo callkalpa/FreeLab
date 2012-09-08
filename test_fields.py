@@ -13,7 +13,8 @@ class TestField():
 
 	# return the list of fields including the test name
 	def get_test_name_and_fields(self):
-		return self.output
+		l = len(self.output)
+		return self.output[:l/2]
 
 	# return test name
 	def get_test_name(self):
