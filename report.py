@@ -9,6 +9,7 @@ class Report:
 
 	output = []
 	fields_list = []
+	frames = []
 	# all units are in points
 	PAGE_WIDTH = 595
 	PAGE_HEIGHT = 842
@@ -19,6 +20,8 @@ class Report:
 	FRAME_WIDTH = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN # in points (7.5 in inches)
 	FRAME_HEIGHT = 0
 	CURRENT_Y_AXIS = PAGE_HEIGHT - TOP_MARGIN # this holds the y coordinate for the next frame
+	FRAME_ID = 0 # holds the frame id
+	SPACE_BETWEEN_TESTS = 20
 
 	test_field = None
 
@@ -35,14 +38,25 @@ class Report:
 
 		self.increase_report_height(24 * len(self.fields_list))
 
+		# start of keepInFrame
+		self.output.append('''<keepInFrame frame="F''' + str(self.FRAME_ID) + '''">''')
+
 		if len(self.fields_list) > 1:
 			self.output.append(self.get_title(temp_from_definition[0]))
 	
 		self.output.append(self.get_fields(self.fields_list))
+		
+		# end of keepInFrame
+		self.output.append('</keepInFrame>')
+
 
 		self.CURRENT_Y_AXIS = self.CURRENT_Y_AXIS - self.FRAME_HEIGHT
-		self.write_xml()
+#		self.write_xml()
+
+		self.frames.append('''<frame id="F''' + str(self.FRAME_ID) + '''" x1="0.5in" y1="''' + str(self.CURRENT_Y_AXIS)  + '''" width="''' + str(self.FRAME_WIDTH) + '''" height="''' + str(self.FRAME_HEIGHT) + '''" showBoundary="1"/>''')
+
 		self.FRAME_HEIGHT = 0
+		self.CURRENT_Y_AXIS -= self.SPACE_BETWEEN_TESTS
 
 	def increase_report_height(self, height):
 		self.FRAME_HEIGHT += height
@@ -64,7 +78,12 @@ class Report:
 	def write_xml(self):
 
 		f = open('temp.xml','w')
-	
+
+		# string for frames
+		frames_string = ''
+		for frame in self.frames:
+			frames_string = frames_string + frame
+
 		# header of the xml
 		f.write('''<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
 	<!DOCTYPE document SYSTEM "rml_1_0.dtd">
@@ -75,7 +94,9 @@ class Report:
 	</docinit>
 	<template pageSize="(''' + str(self.PAGE_WIDTH) + ''',''' + str(self.PAGE_HEIGHT) + ''')" leftMargin="''' + str(self.LEFT_MARGIN)  + '''" rightMargin="''' + str(self.RIGHT_MARGIN)  + '''" showBoundary="0">
 	  <pageTemplate id="main">
-	    <frame id="first" x1="0.5in" y1="''' + str(self.CURRENT_Y_AXIS)  + '''" width="''' + str(self.FRAME_WIDTH) + '''" height="''' + str(self.FRAME_HEIGHT) + '''" showBoundary="1"/>
+'''#	    <frame id="first" x1="0.5in" y1="''' + str(self.CURRENT_Y_AXIS)  + '''" width="''' + str(self.FRAME_WIDTH) + '''" height="''' + str(self.FRAME_HEIGHT) + '''" showBoundary="1"/>
++ str(frames_string) +
+'''
 	  </pageTemplate>
 	</template>
 	<stylesheet>
@@ -106,12 +127,22 @@ class Report:
 
 	def write_pdf(self, fi):
 		factory = ReportFactory()
+		self.fields_list.append('kalpa;kalpa;1;1')
 		factory.render_template(template_file=fi, data=self.fields_list)
-
 		factory.render_document('test.pdf')
 		factory.cleanup()
-	
-	def __init__(self, test_definition_file, data):
+
+	# inputs the test definition file and next data for the next test and the variables are modified accordingly
+	def set_test_info(self, test_definition_file, data):
 		self.test_field = test_fields.TestField(test_definition_file)
 		self.data = data
+		self.FRAME_ID += 1
+		self.fields_list = []
 
+#	def __init__(self, test_definition_file, data):
+		#self.test_field = test_fields.TestField(test_definition_file)
+		#self.data = data
+
+	def __init__(self):
+		self.output = []
+		self.frames = []
