@@ -9,11 +9,16 @@ class Report:
 
 	output = []
 	fields_list = []
-	REPORT_WIDTH = 540 # in points (7.5 in inches)
-	REPORT_HEIGHT = 0 # in points
+	# all units are in points
+	PAGE_WIDTH = 595
+	PAGE_HEIGHT = 842
 	LEFT_MARGIN = 36
 	RIGHT_MARGIN = 36
-	# frame width = REPORT_WIDTH - (LEFT_MARGIN + RIGHT_MARGIN)
+	TOP_MARGIN = 36
+	BOTTOM_MARGIN = 0
+	FRAME_WIDTH = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN # in points (7.5 in inches)
+	FRAME_HEIGHT = 0
+	CURRENT_Y_AXIS = PAGE_HEIGHT - TOP_MARGIN # this holds the y coordinate for the next frame
 
 	test_field = None
 
@@ -35,10 +40,12 @@ class Report:
 	
 		self.output.append(self.get_fields(self.fields_list))
 
+		self.CURRENT_Y_AXIS = self.CURRENT_Y_AXIS - self.FRAME_HEIGHT
 		self.write_xml()
+		self.FRAME_HEIGHT = 0
 
 	def increase_report_height(self, height):
-		self.REPORT_HEIGHT += height
+		self.FRAME_HEIGHT += height
 
 	# title of the test (for tests with multiple fields)
 	def get_title(self, title):
@@ -61,14 +68,14 @@ class Report:
 		# header of the xml
 		f.write('''<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
 	<!DOCTYPE document SYSTEM "rml_1_0.dtd">
-	<document xmlns:py="http://genshi.edgewall.org/">
+	<document xmlns:py="http://genshi.edgewall.org/" filename="test.pdf" compression="true">
 	<docinit>
 		<registerTTFont faceName="Garamond" fileName="font/Garamond.ttf"/>
 		<registerTTFont faceName="Garamond-bold" fileName="font/Garamonb.ttf"/>
 	</docinit>
-	<template leftMargin="''' + str(self.LEFT_MARGIN)  + '''" rightMargin="''' + str(self.RIGHT_MARGIN)  + '''" showBoundary="1" pageSize="A4">
+	<template pageSize="(''' + str(self.PAGE_WIDTH) + ''',''' + str(self.PAGE_HEIGHT) + ''')" leftMargin="''' + str(self.LEFT_MARGIN)  + '''" rightMargin="''' + str(self.RIGHT_MARGIN)  + '''" showBoundary="0">
 	  <pageTemplate id="main">
-	    <frame id="first" x1="0.5in" y1="0.5in" width="''' + str(self.REPORT_WIDTH) + '''" height="''' + str(self.REPORT_HEIGHT) + '''" showBoundary="1"/>
+	    <frame id="first" x1="0.5in" y1="''' + str(self.CURRENT_Y_AXIS)  + '''" width="''' + str(self.FRAME_WIDTH) + '''" height="''' + str(self.FRAME_HEIGHT) + '''" showBoundary="1"/>
 	  </pageTemplate>
 	</template>
 	<stylesheet>
