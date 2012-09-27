@@ -19,7 +19,7 @@ class Report:
 	BOTTOM_MARGIN = 0
 	FRAME_WIDTH = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN # in points (7.5 in inches)
 	FRAME_HEIGHT = 0
-	CURRENT_Y_AXIS = PAGE_HEIGHT - TOP_MARGIN # this holds the y coordinate for the next frame
+	CURRENT_Y_AXIS = PAGE_HEIGHT - TOP_MARGIN # MODIFY reset_current_y_axis() AS WELL. This holds the y coordinate for the next frame
 	FRAME_ID = 0 # holds the frame id
 	SPACE_BETWEEN_TESTS = 20
 
@@ -27,6 +27,9 @@ class Report:
 	tests_dict = None # holds fields list for multiple tests in the same report
 
 	data = {} # holds the dict with test results
+
+	def reset_current_y_axis(self):
+		self.CURRENT_Y_AXIS = self.PAGE_HEIGHT - self.TOP_MARGIN
 
 	def generate_report(self):
 		temp_from_definition = self.test_field.get_test_name_and_fields() # fields read from the test definition file (no test result values)
@@ -38,6 +41,11 @@ class Report:
 			self.fields_list.append(';'.join(tem))
 
 		self.increase_frame_height(24 * len(self.fields_list))
+
+		# go to next page if vertical space left is not sufficient for the frame
+		if (self.CURRENT_Y_AXIS - (self.BOTTOM_MARGIN + self.SPACE_BETWEEN_TESTS)) < self.FRAME_HEIGHT: # not sufficient space left
+			self.output.append('<nextPage />')
+			self.reset_current_y_axis()
 
 		# start of keepInFrame
 		self.output.append('''<keepInFrame frame="F''' + str(self.FRAME_ID) + '''">''')
