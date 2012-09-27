@@ -24,6 +24,7 @@ class Report:
 	SPACE_BETWEEN_TESTS = 20
 
 	test_field = None
+	tests_dict = None # holds fields list for multiple tests in the same report
 
 	data = {} # holds the dict with test results
 
@@ -53,6 +54,9 @@ class Report:
 		self.CURRENT_Y_AXIS = self.CURRENT_Y_AXIS - self.FRAME_HEIGHT
 #		self.write_xml()
 
+		# add fields list to tests_dict
+		self.tests_dict['data' + str(self.FRAME_ID)] = self.fields_list
+
 		self.frames.append('''<frame id="F''' + str(self.FRAME_ID) + '''" x1="0.5in" y1="''' + str(self.CURRENT_Y_AXIS)  + '''" width="''' + str(self.FRAME_WIDTH) + '''" height="''' + str(self.FRAME_HEIGHT) + '''" showBoundary="1"/>''')
 
 		self.FRAME_HEIGHT = 0
@@ -67,10 +71,10 @@ class Report:
 		return '<para style="report_title">' + title + '</para>\n'
 
 	def get_fields(self, fields):
-		temp = """<blockTable style="fields" repeatRows="1" alignment="left" colWidths="234 140.4 46.8 46.8">
+		temp = '''<blockTable style="fields" repeatRows="1" alignment="left" colWidths="234 140.4 46.8 46.8">
 	    <tr><td py:for="i in range(4)"></td></tr>
-	    <tr py:for="line in data"><td py:for="col in line.split(';')" py:content="col" /></tr>
-	  </blockTable>"""
+	    <tr py:for="line in data''' + str(self.FRAME_ID) + '''"><td py:for="col in line.split(';')" py:content="col" /></tr>
+	  </blockTable>'''
 
 		return temp
 	
@@ -127,8 +131,17 @@ class Report:
 
 	def write_pdf(self, fi):
 		factory = ReportFactory()
-		self.fields_list.append('kalpa;kalpa;1;1')
-		factory.render_template(template_file=fi, data=self.fields_list)
+		
+		# define lists separately for tests
+		for i in self.tests_dict.keys():	
+			exec '%s=self.tests_dict[i]' % i	
+
+		# build data string
+		data_string = ''
+		for i in range(1, self.FRAME_ID+1):
+			data_string = data_string + ', data' + str(i) + '=data' + str(i)
+
+		exec 'factory.render_template(template_file=fi %s )' % data_string # output will be like 'factory.render_template(template_file=fi, data1=data1, data2=data2)
 		factory.render_document('test.pdf')
 		factory.cleanup()
 
@@ -146,3 +159,4 @@ class Report:
 	def __init__(self):
 		self.output = []
 		self.frames = []
+		self.tests_dict = {}
