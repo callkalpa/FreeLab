@@ -37,7 +37,7 @@ class Report:
 			tem[1] = str(self.data[db.validate(tem[0])])
 			self.fields_list.append(';'.join(tem))
 
-		self.increase_report_height(24 * len(self.fields_list))
+		self.increase_frame_height(24 * len(self.fields_list))
 
 		# start of keepInFrame
 		self.output.append('''<keepInFrame frame="F''' + str(self.FRAME_ID) + '''">''')
@@ -62,12 +62,12 @@ class Report:
 		self.FRAME_HEIGHT = 0
 		self.CURRENT_Y_AXIS -= self.SPACE_BETWEEN_TESTS
 
-	def increase_report_height(self, height):
+	def increase_frame_height(self, height):
 		self.FRAME_HEIGHT += height
 
 	# title of the test (for tests with multiple fields)
 	def get_title(self, title):
-		self.increase_report_height(28) # title in 14p
+		self.increase_frame_height(28) # title in 14p
 		return '<para style="report_title">' + title + '</para>\n'
 
 	def get_fields(self, fields):
