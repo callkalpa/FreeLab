@@ -6,16 +6,21 @@ class TestField():
 	output = []
 
 	def __init__(self, test_definition_file):
-		#global output
-
+		self.output = []
 		f = open(test_definition_file,'r')
-	
+		
 		for line in f.readlines():
 			self.output.append(line.replace('\n',''))
 
-	# return the list of fields required for mysql table
-	def get_table_field_list(self):
+	# return the list of fields including the test name
+	def get_test_name_and_fields(self):
 		return self.output
+#		l = len(self.output)
+#		return self.output[:l/2]
+
+	# return test name
+	def get_test_name(self):
+		return self.output[0]
 
 	# return the list of fields required for gui
 	def get_gui_field_list(self):

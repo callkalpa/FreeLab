@@ -15,7 +15,7 @@ def decode_test_definition(fi):
 	global test_definition_file
 	test_definition_file = fi
 	test_field = test_fields.TestField(fi)
-	data = test_field.get_table_field_list()
+	data = test_field.get_test_name_and_fields()
 
 # start of report section
 
@@ -44,9 +44,9 @@ def generate_gui():
 # start of database section
 
 def check_for_table():
-	sql = 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema="' + db.get_database() + '" AND table_name="' + db.validate(data[0]) + '";'
+	sql = 'SELECT COUNT(*) AS exist FROM information_schema.tables WHERE table_schema="' + db.get_database() + '" AND table_name="' + db.validate(data[0]) + '";'
 	cur = db.execute_sql(sql)
-	tmp = cur.fetchone()[0]
+	tmp = cur.fetchone()['exist']
 	if tmp > 0:
 		print 'table \'' + data[0] + '\' already exists'
 		return True;
