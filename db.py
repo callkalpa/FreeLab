@@ -24,7 +24,7 @@ def execute_sql(sql):
 	cur.execute(sql)
 	return cur
 
-# insert command to table to insert test data
+# insert command to table to insert test data, patient info
 def feed_test_data(test_name, values):
 	sql = 'INSERT INTO `' + test_name + '` (' + (','.join(values.keys())) + ') VALUES (' + (','.join(values.values())) + ')'
 	execute_sql(sql)
@@ -34,6 +34,15 @@ def retrive_test_data(test_name, patient_id):
 	sql = 'SELECT * FROM `' + test_name + '` WHERE `patient_id`=' + patient_id
 	return execute_sql(sql)
 
+# returns a list of tests available (Display names)
+def get_tests_list():
+	sql = 'SELECT `display_name` FROM test_info'
+	temp = execute_sql(sql)
+	test_list = []
+	for test in temp.fetchall():
+		test_list.append(test['display_name'])
+	return test_list
+	
 # modifies text so that so that it is valid as a table/field name
 def validate(text):
 	return text.lower().replace(' ','_')
