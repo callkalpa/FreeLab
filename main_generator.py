@@ -1,4 +1,4 @@
-# generates the main, patient sql tables and main gui
+# generates the patient, main, test_info sql tables
 
 import db
 
@@ -35,6 +35,7 @@ def create_tables():
 	test_info = ''' CREATE TABLE IF NOT EXISTS `test_info`(
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 `test_id` INT,
+`display_name` VARCHAR(50) NULL,
 `definition_file` VARCHAR(30) NULL,
 `gui_file` VARCHAR(40) NULL
 )'''	
