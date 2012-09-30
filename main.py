@@ -8,16 +8,30 @@ import re
 
 builder = Gtk.Builder()
 patient_id = ''
+test_list_data = Gtk.ListStore(str)
+
+gui_name = None
+gui_sample_co = None
+gui_requested_bd = None
+gui_billed_by = None
+gui_test_list = None
+gui_test_list_selection = None
 
 class Handler:
 	global builder
+	global test_list_data
 	global patient_id
+
+	global gui_name
+	global gui_sample_co
+	global gui_requested_bd
+	global gui_billed_by
+	global gui_test_list
+	global gui_test_list_selection
+
 
 	def onDeleteWindow(self, *args):
 		Gtk.main_quit(*args)
-
-	def search():
-		pass
 
 	def add_patient():
 		pass
@@ -34,56 +48,69 @@ class Handler:
 	def preview():
 		pass
 
-	def done(self, button):
-		global values
-		fields = test_field.get_gui_field_list()
+	def search(self, button):
+		tmp = builder.get_object('patient_id').get_text()
+		patient_info = db.get_patient(tmp)
+		if patient_info != None:
+			patient_id = tmp
 
-		values['`id`'] = '0' # auto increment value
-		values['`time_stamp`'] = "'" + str(datetime.datetime.now()) + "'"
+			# display patient information
+			patient = patient_info['patient']
+			gui_name.set_text(patient['name'])
+			gui_sample_co.set_text(str(patient['sample_co']))
+			gui_requested_bd.set_text(patient['requested_bd'])
+			gui_billed_by.set_text(patient['billed_by'])
 
-		for field in fields:
-			obj =  builder.get_object(field)
+			# display tests
+			test_list_data.clear()
+			tests = patient_info['tests']
+			for test in tests:
+				tmp = []
+				tmp.append(db.get_test_display_name(test['test_id']))
+				test_list_data.append(tmp)
 
-			key = '`' + field + '`'			
-
-			if obj == None:
-				# calculation field
-				values[key] = "'" + str(get_calculation_result(field)) + "'" # result of the calculation 
-				continue
-
-			object_type = obj.get_name()
-			
-			if object_type == 'GtkEntry':
-				values[key] = "'" + get_gtkEntry_value(obj) + "'"
-			elif object_type == 'GtkTextView':
-				values[key] = "'" + get_gtkTextView_value(obj) + "'"
-			elif object_type == 'GtkComboBoxText':
-				values[key] = "'" + get_gtkComboBoxText_value(obj) + "'"
-
-		# calls sql insert command with test definition file name, fields and values
-		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)	
-
-def get_gtkEntry_value(obj):
-	return obj.get_text()
-
-def get_gtkTextView_value(obj):
-	buf = obj.get_buffer()
-	return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
-
-def get_gtkComboBoxText_value(obj):
-	temp = obj.get_active_text()
-	if temp == None:
-		return ''
-	return temp
+		else: # if the patient (patient_id) is not found
+			self.clear_all()
+		
+	# clears all gui and tests list	
+	def clear_all(self):
+		patient_id = None
+		gui_name.set_text('')
+		gui_sample_co.set_text('')
+		gui_requested_bd.set_text('')
+		gui_billed_by.set_text('')
+		test_list_data.clear()
 
 def main():
 	global builder
+	global test_list_data
 	
+	global gui_name
+	global gui_sample_co
+	global gui_requested_bd
+	global gui_billed_by
+	global gui_test_list
+	global gui_test_list_selection
+
 	builder.add_from_file('gui/main.glade')
 	builder.connect_signals(Handler())
 
 	window = builder.get_object("main")
 	window.show_all()
+	
+	# assign gui components
+	gui_name = builder.get_object('name')
+	gui_sample_co = builder.get_object('sample_co')
+	gui_requested_bd = builder.get_object('requested_bd')
+	gui_billed_by = builder.get_object('billed_by')
+	gui_test_list = builder.get_object('test_list')
+	gui_test_list_selection = builder.get_object('test_list_selection')
+
+	# prepare list view
+	test_renderer = Gtk.CellRendererText()
+	test_column = Gtk.TreeViewColumn('Test', test_renderer, text = 0)
+	gui_test_list.set_model(test_list_data)
+	gui_test_list.append_column(test_column)
 	
 	Gtk.main()
 
