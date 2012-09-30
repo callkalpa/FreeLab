@@ -15,6 +15,8 @@ def create_tables():
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 `patient_id` VARCHAR(10) NULL,
 `name` VARCHAR(20) NULL,
+`requested_bd` VARCHAR(30) NULL,
+`sample_co` DATE NULL,
 `user` VARCHAR(10) NULL
 )'''
 	db.execute_sql(patient_sql)
@@ -23,8 +25,6 @@ def create_tables():
 	main_sql = '''CREATE TABLE IF NOT EXISTS `main`(
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 `patient_id` VARCHAR(10) NULL,
-`requested_bd` VARCHAR(30) NULL,
-`sample_co` DATE NULL,
 `test_id` INT NULL,
 `data_entered` TIMESTAMP NULL,
 `printed` TIMESTAMP NULL
