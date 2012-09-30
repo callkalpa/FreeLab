@@ -49,6 +49,26 @@ def get_test_id(test):
 	temp = execute_sql(sql).fetchone()['test_id']
 	return temp
 
+# returns the test display name of the desired test id
+def get_test_display_name(test_id):
+	sql = "SELECT `display_name` FROM test_info WHERE `test_id`='" + str(test_id) + "'"
+	temp = execute_sql(sql).fetchone()['display_name']
+	return temp
+
+def get_patient(patient_id):
+	return_dic = {}
+	sql_patient = "SELECT * FROM `patient` WHERE `patient_id`='" + str(patient_id) + "'"
+	temp_patient = execute_sql(sql_patient).fetchone()
+	if temp_patient != None:
+		return_dic['patient'] = temp_patient
+		sql_tests = "SELECT * FROM `main` WHERE `patient_id`='" + patient_id + "'"
+		temp_tests = execute_sql(sql_tests).fetchall()
+
+		return_dic['tests'] = temp_tests
+		return return_dic
+
+	
+
 # modifies text so that so that it is valid as a table/field name
 def validate(text):
 	return text.lower().replace(' ','_')
