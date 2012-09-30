@@ -17,7 +17,7 @@ def create_tables():
 `name` VARCHAR(20) NULL,
 `requested_bd` VARCHAR(30) NULL,
 `sample_co` DATE NULL,
-`user` VARCHAR(10) NULL
+`billed_by` VARCHAR(10) NULL
 )'''
 	db.execute_sql(patient_sql)
 
