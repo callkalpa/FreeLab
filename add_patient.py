@@ -45,7 +45,7 @@ class Handler:
 		patient['`name`'] = "'" + builder.get_object('name').get_text() + "'"
 		patient['`requested_bd`'] = "'" + builder.get_object('requested_bd').get_text() + "'"
 		patient['`sample_co`'] = "'" + builder.get_object('sample_co').get_text() + "'"
-		patient['`user`'] = "'MANUAL'"
+		patient['`billed_by`'] = "'MANUAL'"
 
 		# feed data to patient table
 		db.feed_test_data('patient', patient)
