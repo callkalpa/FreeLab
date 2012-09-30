@@ -36,13 +36,19 @@ def retrive_test_data(test_name, patient_id):
 
 # returns a list of tests available (Display names)
 def get_tests_list():
-	sql = 'SELECT `display_name` FROM test_info'
+	sql = 'SELECT `display_name` FROM test_info ORDER BY `display_name`'
 	temp = execute_sql(sql)
 	test_list = []
 	for test in temp.fetchall():
 		test_list.append(test['display_name'])
 	return test_list
-	
+
+# returns the test id of the desired test
+def get_test_id(test):
+	sql ="SELECT `test_id` FROM test_info WHERE `display_name`='" + test + "'"
+	temp = execute_sql(sql).fetchone()['test_id']
+	return temp
+
 # modifies text so that so that it is valid as a table/field name
 def validate(text):
 	return text.lower().replace(' ','_')
