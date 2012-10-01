@@ -5,10 +5,11 @@ import sys
 import db
 import datetime
 import re
+import os
 
 builder = Gtk.Builder()
 patient_id = ''
-test_list_data = Gtk.ListStore(str)
+test_list_data = Gtk.ListStore(str, str, str) # test name, data entered data, printed data
 
 gui_name = None
 gui_sample_co = None
@@ -28,16 +29,9 @@ class Handler:
 	global gui_billed_by
 	global gui_test_list
 	global gui_test_list_selection
-
-
+	
 	def onDeleteWindow(self, *args):
 		Gtk.main_quit(*args)
-
-	def add_patient():
-		pass
-
-	def add():
-		pass
 
 	def print_all():
 		pass
@@ -47,6 +41,12 @@ class Handler:
 
 	def preview():
 		pass
+
+	def enter_data(self, button):
+		model, row = gui_test_list.get_selection().get_selected()
+		if row != None:
+			print db.get_test_definition_file(model[row][0])
+			print db.get_test_gui_file(model[row][0])
 
 	def search(self, button):
 		tmp = builder.get_object('patient_id').get_text()
@@ -67,6 +67,16 @@ class Handler:
 			for test in tests:
 				tmp = []
 				tmp.append(db.get_test_display_name(test['test_id']))
+				# append data entered and printed
+				if test['data_entered'] != None:
+					tmp.append(str(test['data_entered']))
+				else:
+					tmp.append('')
+				if test['printed'] != None:
+					tmp.append(str(test['printed']))
+				else:
+					tmp.append('')
+
 				test_list_data.append(tmp)
 
 		else: # if the patient (patient_id) is not found
@@ -92,7 +102,7 @@ def main():
 	global gui_test_list
 	global gui_test_list_selection
 
-	builder.add_from_file('gui/main.glade')
+	builder.add_from_file(os.path.join('gui', 'main.glade'))
 	builder.connect_signals(Handler())
 
 	window = builder.get_object("main")
@@ -107,10 +117,20 @@ def main():
 	gui_test_list_selection = builder.get_object('test_list_selection')
 
 	# prepare list view
+	# tests
 	test_renderer = Gtk.CellRendererText()
 	test_column = Gtk.TreeViewColumn('Test', test_renderer, text = 0)
-	gui_test_list.set_model(test_list_data)
 	gui_test_list.append_column(test_column)
+	# data entered
+	data_renderer = Gtk.CellRendererText()
+	data_column = Gtk.TreeViewColumn('Data Entered', data_renderer, text = 1)
+	gui_test_list.append_column(data_column)
+	# printed
+	print_renderer = Gtk.CellRendererText()
+	print_column = Gtk.TreeViewColumn('Printed', print_renderer, text = 2)
+	gui_test_list.append_column(print_column)
+	
+	gui_test_list.set_model(test_list_data)
 	
 	Gtk.main()
 
