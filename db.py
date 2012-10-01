@@ -1,4 +1,5 @@
 import MySQLdb
+import os
 
 DBFILE='db.config'
 settings = {}
@@ -54,6 +55,18 @@ def get_test_display_name(test_id):
 	sql = "SELECT `display_name` FROM test_info WHERE `test_id`='" + str(test_id) + "'"
 	temp = execute_sql(sql).fetchone()['display_name']
 	return temp
+
+# returns the definition file of the desired test
+def get_test_definition_file(test):
+	sql ="SELECT `definition_file` FROM test_info WHERE `display_name`='" + test + "'"
+	temp = execute_sql(sql).fetchone()['definition_file']
+	return os.path.join('definition', temp) # definition is the directory of test definition files
+
+# returns the gui file of the desired test
+def get_test_gui_file(test):
+	sql ="SELECT `gui_file` FROM test_info WHERE `display_name`='" + test + "'"
+	temp = execute_sql(sql).fetchone()['gui_file']
+	return os.path.join('gui', temp) # gui is the directory of the test gui files
 
 def get_patient(patient_id):
 	return_dic = {}
