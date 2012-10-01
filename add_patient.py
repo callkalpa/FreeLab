@@ -5,6 +5,7 @@ import sys
 import db
 import datetime
 import re
+import os
 
 builder = Gtk.Builder()
 test_list_data = Gtk.ListStore(str)
@@ -88,7 +89,7 @@ def main():
 	global gui_test_list
 	global gui_test_list_selection
 	
-	builder.add_from_file('gui/add_patient.glade')
+	builder.add_from_file(os.path.join('gui','add_patient.glade'))
 	builder.connect_signals(Handler())
 
 	window = builder.get_object("main")
