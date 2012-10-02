@@ -6,10 +6,12 @@ import db
 import datetime
 import re
 import os
+import show_gui
+import sys
 
 builder = Gtk.Builder()
 patient_id = ''
-test_list_data = Gtk.ListStore(str, str, str) # test name, data entered data, printed data
+test_list_data = Gtk.ListStore(str, str, str, str) # test name, data entered data, printed data, index
 
 gui_name = None
 gui_sample_co = None
@@ -31,7 +33,7 @@ class Handler:
 	global gui_test_list_selection
 	
 	def onDeleteWindow(self, *args):
-		Gtk.main_quit(*args)
+		sys.exit(0)
 
 	def print_all():
 		pass
@@ -43,17 +45,21 @@ class Handler:
 		pass
 
 	def enter_data(self, button):
+		global patient_id
 		model, row = gui_test_list.get_selection().get_selected()
 		if row != None:
-			print db.get_test_definition_file(model[row][0])
-			print db.get_test_gui_file(model[row][0])
+			test_gui_file = db.get_test_gui_file(model[row][0])
+			index = model[row][3]
+			show_gui.main(test_gui_file, patient_id, index)
+			self.search(button)
 
 	def search(self, button):
+		global patient_id
 		tmp = builder.get_object('patient_id').get_text()
 		patient_info = db.get_patient(tmp)
 		if patient_info != None:
 			patient_id = tmp
-
+			
 			# display patient information
 			patient = patient_info['patient']
 			gui_name.set_text(patient['name'])
@@ -76,6 +82,9 @@ class Handler:
 					tmp.append(str(test['printed']))
 				else:
 					tmp.append('')
+				
+				# append index
+				tmp.append(str(test['id']))
 
 				test_list_data.append(tmp)
 
@@ -129,6 +138,10 @@ def main():
 	print_renderer = Gtk.CellRendererText()
 	print_column = Gtk.TreeViewColumn('Printed', print_renderer, text = 2)
 	gui_test_list.append_column(print_column)
+	# index 
+	index_renderer = Gtk.CellRendererText()
+	index_column = Gtk.TreeViewColumn('Index', index_renderer, text = 3)
+	gui_test_list.append_column(index_column)
 	
 	gui_test_list.set_model(test_list_data)
 	
