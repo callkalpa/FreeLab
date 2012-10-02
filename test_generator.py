@@ -74,11 +74,7 @@ def generate_table():
 		value = get_table_field(tmp[1][0])
 		sql = sql + '`' + test_name + '` ' + value + ' NULL , \n'
 
-
-	sql = sql + ('`user` VARCHAR(2) NULL , \n'
-	'`time_stamp` TIMESTAMP NULL, \n'
-	'PRIMARY KEY (`id`))')
-
+	sql = sql + ('PRIMARY KEY (`id`))')
 
 	db.execute_sql(sql)
 	print '\'' + data[0] + '\' table created'
