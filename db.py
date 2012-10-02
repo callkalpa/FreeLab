@@ -1,5 +1,6 @@
 import MySQLdb
 import os
+import datetime
 
 DBFILE='db.config'
 settings = {}
@@ -80,6 +81,9 @@ def get_patient(patient_id):
 		return_dic['tests'] = temp_tests
 		return return_dic
 
+def update_data_entered(index):
+	sql = "UPDATE main SET data_entered = '" + str(datetime.datetime.now()) + "' WHERE id=" + index
+	execute_sql(sql)
 	
 
 # modifies text so that so that it is valid as a table/field name
