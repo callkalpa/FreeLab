@@ -11,21 +11,26 @@ builder = Gtk.Builder()
 
 test_field = None
 values = {} # to hold the field names and values to be fed into the table
+patient_id = None
+index = None
 
 class Handler:
 	global builder
 	global test_field
+	global patient_id
+	global index
 
 	def onDeleteWindow(self, *args):
 		Gtk.main_quit(*args)
-	
 
 	def done(self, button):
 		global values
-		fields = test_field.get_gui_field_list()
+		global index
 
+		fields = test_field.get_gui_field_list()
+		
 		values['`id`'] = '0' # auto increment value
-		values['`time_stamp`'] = "'" + str(datetime.datetime.now()) + "'"
+		values['`patient_id`'] = "'" + str(patient_id) + "'"
 
 		for field in fields:
 			obj =  builder.get_object(field)
@@ -47,7 +52,13 @@ class Handler:
 				values[key] = "'" + get_gtkComboBoxText_value(obj) + "'"
 
 		# calls sql insert command with test definition file name, fields and values
-		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)	
+		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)
+
+		# update the data entered field of main table
+		db.update_data_entered(index)
+
+		# close the window
+		self.window.destroy()
 
 def get_calculation_result(field):
 	global test_field
@@ -82,11 +93,16 @@ def get_gtkComboBoxText_value(obj):
 	return temp
 
 
-def main():
+def main(test_gui_file, pat_id, ind):
 	global builder
 	global test_field
-	
-	builder.add_from_file(sys.argv[1])
+	global patient_id
+	global index
+	global values
+
+	values = {}
+
+	builder.add_from_file(test_gui_file)
 	builder.connect_signals(Handler())
 
 	window = builder.get_object("main")
@@ -95,8 +111,11 @@ def main():
 	test_definition_file = builder.get_object('test_filename').get_text()
 	test_field = test_fields.TestField(test_definition_file)
 	
+	patient_id = pat_id
+	index = ind
+
 	Gtk.main()
 
 if __name__ == '__main__':
-	main()
+	main(sys.argv[1], sys.argv[2], sys.argv[3]) # test definition file, patient_id, index
 
