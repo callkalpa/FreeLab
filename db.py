@@ -31,9 +31,19 @@ def feed_test_data(test_name, values):
 	sql = 'INSERT INTO `' + test_name + '` (' + (','.join(values.keys())) + ') VALUES (' + (','.join(values.values())) + ')'
 	execute_sql(sql)
 
+# generates list to be used in preparing main report (patient information)
+def get_main_report_list(patient_id):
+	sql = "SELECT * FROM `patient` WHERE `patient_id`='" + patient_id + "'"
+	tmp = execute_sql(sql).fetchone()
+	t = str(datetime.datetime.now())
+	date = t.split(' ')[0]
+	time = t.split(' ')[1].split('.')[0]
+	list_temp = 'Serial No:;' + str(tmp['patient_id']) + ';;#Name:;' + tmp['name'] + ';Date:;' + date + '#Sample Collected On:;' + str(tmp['sample_co']) + ';Time:;' + time + '#Requested By Doctor:;' + tmp['requested_bd'] + ';;'
+	return list_temp
+
 # retrives test data based on patient_id
 def retrive_test_data(test_name, patient_id):
-	sql = 'SELECT * FROM `' + test_name + '` WHERE `patient_id`=' + patient_id
+	sql = "SELECT * FROM `" + test_name + "` WHERE `patient_id`='" + patient_id + "'"
 	return execute_sql(sql)
 
 # returns a list of tests available (Display names)
@@ -84,7 +94,6 @@ def get_patient(patient_id):
 def update_data_entered(index):
 	sql = "UPDATE main SET data_entered = '" + str(datetime.datetime.now()) + "' WHERE id=" + index
 	execute_sql(sql)
-	
 
 # modifies text so that so that it is valid as a table/field name
 def validate(text):
