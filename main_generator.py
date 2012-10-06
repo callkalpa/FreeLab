@@ -14,7 +14,7 @@ def create_tables():
 	patient_sql = '''CREATE TABLE IF NOT EXISTS `patient`(
 `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 `patient_id` VARCHAR(10) NULL,
-`name` VARCHAR(20) NULL,
+`name` VARCHAR(30) NULL,
 `requested_bd` VARCHAR(30) NULL,
 `sample_co` DATE NULL,
 `billed_by` VARCHAR(10) NULL
