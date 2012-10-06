@@ -8,6 +8,9 @@ import re
 import os
 import show_gui
 import sys
+import generate_report
+import add_patient
+import webbrowser
 
 builder = Gtk.Builder()
 patient_id = ''
@@ -35,23 +38,40 @@ class Handler:
 	def onDeleteWindow(self, *args):
 		sys.exit(0)
 
-	def print_all():
-		pass
+	def print_all(self, button):
+		if len(test_list_data) > 0:
+			gui_test_list_selection.select_all()
+			self.generate_report()
+			# print statement should go here
 
-	def print_selected():
-		pass
+	def print_selected(self, button):
+		self.generate_report()
+		# print statement should go here
 
-	def preview():
-		pass
+	def preview(self, button):
+		if len(test_list_data) > 0:
+			gui_test_list_selection.select_all()
+			self.generate_report()
+			# views the pdf in system default pdf viewer
+			webbrowser.open('test.pdf')
 
 	def enter_data(self, button):
 		global patient_id
-		model, row = gui_test_list.get_selection().get_selected()
-		if row != None:
-			test_gui_file = db.get_test_gui_file(model[row][0])
-			index = model[row][3]
+		model, rows = gui_test_list.get_selection().get_selected_rows()
+		for row in rows:
+			iter = model.get_iter(row)
+			test_gui_file = db.get_test_gui_file(model.get_value(iter,0))
+			index = model.get_value(iter, 3)
 			show_gui.main(test_gui_file, patient_id, index)
 			self.search(button)
+		#if row != None:
+		#	test_gui_file = db.get_test_gui_file(model[row][0])
+		#	index = model[row][3]
+		#	show_gui.main(test_gui_file, patient_id, index)
+		#	self.search(button)
+
+	def add_patient(self, button):
+		add_patient.main()
 
 	def search(self, button):
 		global patient_id
@@ -99,6 +119,16 @@ class Handler:
 		gui_requested_bd.set_text('')
 		gui_billed_by.set_text('')
 		test_list_data.clear()
+
+	def generate_report(self):
+		model, rows = gui_test_list.get_selection().get_selected_rows()
+		test_definition_files = []
+		for row in rows:
+			iter = model.get_iter(row)
+			if model.get_value(iter, 1) != '':
+				test_definition_files.append(db.get_test_definition_file(model.get_value(iter, 0)))
+		# generates the report
+		generate_report.gen_report(patient_id, test_definition_files)
 
 def main():
 	global builder
