@@ -13,12 +13,14 @@ test_field = None
 values = {} # to hold the field names and values to be fed into the table
 patient_id = None
 index = None
+data_entered = None # used to store the dictionary of data in case there are previous data
 
 class Handler:
 	global builder
 	global test_field
 	global patient_id
 	global index
+	global data_entered
 
 	def onDeleteWindow(self, *args):
 		Gtk.main_quit(*args)
@@ -26,6 +28,7 @@ class Handler:
 	def done(self, button):
 		global values
 		global index
+		global data_entered
 
 		fields = test_field.get_gui_field_list()
 		
@@ -51,8 +54,11 @@ class Handler:
 			elif object_type == 'GtkComboBoxText':
 				values[key] = "'" + get_gtkComboBoxText_value(obj) + "'"
 
-		# calls sql insert command with test definition file name, fields and values
-		db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)
+		# if there are preiously entered data do an update, else do an insert
+		if data_entered is None:
+			db.feed_test_data(db.validate(builder.get_object('title').get_text()), values)
+		else:
+			db.update_test_data(db.validate(builder.get_object('title').get_text()), values, data_entered['id'])
 
 		# update the data entered field of main table
 		db.update_data_entered(index)
@@ -92,14 +98,51 @@ def get_gtkComboBoxText_value(obj):
 		return ''
 	return temp
 
+def set_gtkEntry_value(obj, value):
+	obj.set_text(str(value))
 
-def main(test_gui_file, pat_id, ind):
+def set_gtkTextView_value(obj, value):
+	help(obj)
+	obj.set_buffer(str(value))
+
+def set_gtkComboBoxText_value(obj, value):
+	#help(obj)
+	model = obj.get_model()
+	print type(model)
+	help(model)
+	#obj.set_active(str(value))
+	model.set_active(str(value))
+
+# displays previous data in the gui
+def display_previous_data():
+	global test_field
+	global data_entered
+
+	fields = test_field.get_gui_field_list()
+		
+	for field in fields:
+		obj =  builder.get_object(field)
+
+		if obj is not None:
+			key = "'" + field + "'"			
+			object_type = obj.get_name()
+			value = data_entered[field]
+			if object_type == 'GtkEntry':
+				set_gtkEntry_value(obj, value)
+			elif object_type == 'GtkTextView':
+				set_gtkTextView_value(obj, value)
+			elif object_type == 'GtkComboBoxText':
+				set_gtkComboBoxText_value(obj, value)
+
+
+def main(test_gui_file, pat_id, ind, data_enter):
 	global builder
 	global test_field
 	global patient_id
 	global index
 	global values
-
+	global data_entered
+	
 	values = {}
 
 	builder.add_from_file(test_gui_file)
@@ -113,6 +156,10 @@ def main(test_gui_file, pat_id, ind):
 	
 	patient_id = pat_id
 	index = ind
+	data_entered = data_enter
+	
+	if data_entered is not None:
+		display_previous_data()
 
 	Gtk.main()
 
