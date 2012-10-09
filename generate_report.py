@@ -17,8 +17,7 @@ def gen_report(patient_id, test_definition_files):
 	for test_definition_file in test_definition_files:
 		temp = test_fields.TestField(test_definition_file)
 		test_name = db.validate(temp.get_test_name())
-		cur = db.retrive_test_data(test_name, patient_id)
-		data = cur.fetchone()
+		data = db.retrive_test_data(test_name, patient_id)
 		rep.set_test_info(test_definition_file, data)
 		rep.generate_report()
 
