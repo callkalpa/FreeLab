@@ -31,6 +31,18 @@ def feed_test_data(test_name, values):
 	sql = 'INSERT INTO `' + test_name + '` (' + (','.join(values.keys())) + ') VALUES (' + (','.join(values.values())) + ')'
 	execute_sql(sql)
 
+# update command to table to modify test data based on the index (id)
+def update_test_data(test_name, values, index):
+	temp = []
+	for t in values.keys():
+		# don't update the id field
+		if t == '`id`':
+			continue
+		temp.append(t + " = " + values[t])
+
+	sql = 'UPDATE `' + test_name + '` SET ' + ','.join(temp) + ' WHERE id=' + str(index)
+	execute_sql(sql)
+
 # generates list to be used in preparing main report (patient information)
 def get_main_report_list(patient_id):
 	sql = "SELECT * FROM `patient` WHERE `patient_id`='" + patient_id + "'"
@@ -44,7 +56,7 @@ def get_main_report_list(patient_id):
 # retrives test data based on patient_id
 def retrive_test_data(test_name, patient_id):
 	sql = "SELECT * FROM `" + test_name + "` WHERE `patient_id`='" + patient_id + "'"
-	return execute_sql(sql)
+	return execute_sql(sql).fetchone()
 
 # returns a list of tests available (Display names)
 def get_tests_list():
@@ -78,6 +90,12 @@ def get_test_gui_file(test):
 	sql ="SELECT `gui_file` FROM test_info WHERE `display_name`='" + test + "'"
 	temp = execute_sql(sql).fetchone()['gui_file']
 	return os.path.join('gui', temp) # gui is the directory of the test gui files
+
+# returns the table name of the desired test
+def get_test_table_name(test):
+	sql ="SELECT `gui_file` FROM test_info WHERE `display_name`='" + test + "'"
+	temp = execute_sql(sql).fetchone()['gui_file']
+	return temp.replace('.glade', '') # gui file contains the test table name with .glade
 
 def get_patient(patient_id):
 	return_dic = {}
