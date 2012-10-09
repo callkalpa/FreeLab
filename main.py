@@ -60,9 +60,16 @@ class Handler:
 		model, rows = gui_test_list.get_selection().get_selected_rows()
 		for row in rows:
 			iter = model.get_iter(row)
-			test_gui_file = db.get_test_gui_file(model.get_value(iter,0))
+			test_name = model.get_value(iter, 0)
+			test_gui_file = db.get_test_gui_file(test_name)
 			index = model.get_value(iter, 3)
-			show_gui.main(test_gui_file, patient_id, index)
+			
+			# check whether data is already entered, is so pass the dictionary containing data
+			data_entered = None
+			if model.get_value(iter, 1) != '':
+				data_entered = db.retrive_test_data(db.get_test_table_name(test_name), patient_id) # test_gui_file contains the test table name and .glade
+			
+			show_gui.main(test_gui_file, patient_id, index, data_entered)
 			self.search(button)
 		#if row != None:
 		#	test_gui_file = db.get_test_gui_file(model[row][0])
